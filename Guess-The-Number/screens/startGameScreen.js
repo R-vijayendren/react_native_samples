@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, Button,
-  TouchableWithoutFeedback, Keyboard, Alert, Dimensions
+  View, Text, StyleSheet, Button, ScrollView,
+  TouchableWithoutFeedback, Keyboard, Alert, Dimensions,
+  KeyboardAvoidingView
 } from 'react-native';
 import Card from '../components/Card';
 import Colors from '../constants/colors';
@@ -16,13 +17,28 @@ const StartScreen = props => {
   const [enteredValue, setEnteredValue] = useState('');
   const [confirmed, setConfirmed] = useState(false);
   const [selectedNum, setSelectedNum] = useState();
+  const [buttonWidth, setButtonWidth] = useState(Dimensions.get('window').width / 4);
+
   const numberHandler = inputText => {
     setEnteredValue(inputText.replace(/[^0-9]/g, ''));
   };
 
   const resetHandler = () => {
     setEnteredValue('');
+    setConfirmed(false);
   };
+
+  useEffect(() => {
+    const updateLayout = () => {
+      setButtonWidth(Dimensions.get('window').width / 4);
+    };
+
+    Dimensions.addEventListener('change', updateLayout);
+
+    return () => {
+      Dimensions.removeEventListener('change', updateLayout);
+    };
+  });
 
   const confirmHandler = () => {
     const chosenNum = parseInt(enteredValue);
@@ -51,37 +67,41 @@ const StartScreen = props => {
   }
 
   return (
-    // <TouchableWithoutFeedback 
-    //   onPress={() => {
-    //     Keyboard.dismiss();
-    //   }}
-    // >
-    <View style={styles.startScreen}>
-      <Text style={styles.title}>Start a New Game..!</Text>
-      <Card style={styles.inputContainer}>
-        <BodyText>Select a Number</BodyText>
-        <Input
-          style={styles.input}
-          blurOnSubmit
-          autoCapitalize='none'
-          autoCorrect={false}
-          keyboardType='number-pad'
-          maxLength={2}
-          onChangeText={numberHandler}
-          value={enteredValue}
-        />
-        <View style={styles.buttonContainer}>
-          <View style={styles.button}>
-            <Button title="Reset" color={Colors.secondary} onPress={resetHandler} />
+    <ScrollView>
+      <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={30} >
+        <TouchableWithoutFeedback
+          onPress={() => {
+            Keyboard.dismiss();
+          }}
+        >
+          <View style={styles.startScreen}>
+            <Text style={styles.title}>Start a New Game..!</Text>
+            <Card style={styles.inputContainer}>
+              <BodyText>Select a Number</BodyText>
+              <Input
+                style={styles.input}
+                blurOnSubmit
+                autoCapitalize='none'
+                autoCorrect={false}
+                keyboardType='number-pad'
+                maxLength={2}
+                onChangeText={numberHandler}
+                value={enteredValue}
+              />
+              <View style={styles.buttonContainer}>
+                <View style={{ width: buttonWidth }}>
+                  <Button title="Reset" color={Colors.secondary} onPress={resetHandler} />
+                </View>
+                <View style={{ width: buttonWidth }}>
+                  <Button title="Confrim" color={Colors.accent} onPress={confirmHandler} />
+                </View>
+              </View>
+            </Card>
+            {confirmedOutput}
           </View>
-          <View style={styles.button}>
-            <Button title="Confrim" color={Colors.accent} onPress={confirmHandler} />
-          </View>
-        </View>
-      </Card>
-      {confirmedOutput}
-    </View>
-    // </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 };
 
@@ -119,10 +139,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 15,
   },
-  button: {
-    // width: 100,
-    width: Dimensions.get('window').width / 4,
-  },
+  // button: {
+  //   // width: 100,
+  //   width: Dimensions.get('window').width / 4,
+  // },
   selectedContainer: {
     height: 200,
     marginTop: 10,
