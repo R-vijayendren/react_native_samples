@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 10,
     overflow: 'hidden',
+    elevation: 5,
   },
   touchableCont: {
     flex: 1,
@@ -43,7 +44,6 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 10,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    elevation: 3,
     /* ios features */
     // shadowColor: 'black',
     // shadowOpacity: 0.26,

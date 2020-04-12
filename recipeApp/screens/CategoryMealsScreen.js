@@ -1,41 +1,31 @@
 import React from 'react';
-import { StyleSheet, Text, Button, View, Platform, FlatList } from 'react-native';
+import { useSelector } from 'react-redux';
 
-import { CATEGORIES, MEALS } from '../data/dummy-data';
-import MealItem from '../components/MealItem';
-import Colors from '../constants/Colors';
+import { CATEGORIES } from '../data/dummy-data';
+import MealList from '../components/MealList';
+import { View, StyleSheet } from 'react-native';
+import DefaultText from '../components/DefaultText';
 
 const CategoryMealScreen = props => {
-  const renderMealItem = itemData => {
-    return (
-      <MealItem
-        title={itemData.item.title}
-        onSelectMeal={() => {
-          props.navigation.navigate({
-            routeName: 'MealDetail', params: {
-              mealId: itemData.item.id
-            }
-          })
-        }}
-        duration={itemData.item.duration}
-        complexity={itemData.item.complexity}
-        affordability={itemData.item.affordability}
-        image={itemData.item.imageUrl}
-      />
-    );
-  };
 
   const catId = props.navigation.getParam('categoryId');
 
-  const displayedMeals = MEALS.filter(meal => meal.categoryIds.indexOf(catId) >= 0);
+  const availableMeals = useSelector(state => state.meals.filteredMeals);
+
+  const displayedMeals = availableMeals.filter(meal =>
+    meal.categoryIds.indexOf(catId) >= 0
+  );
+
+  if (displayedMeals.length === 0) {
+    return (
+      <View style={styles.screen}>
+        <DefaultText>No meals found, maybe check your filters?</DefaultText>
+      </View>
+    );
+  }
+
   return (
-    < View style={styles.screen} >
-      <FlatList
-        data={displayedMeals}
-        keyExtractor={(item, index) => item.id}
-        renderItem={renderMealItem}
-      />
-    </View >
+    <MealList listData={displayedMeals} navigation={props.navigation} />
   );
 };
 
@@ -53,9 +43,8 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 15
-  },
+    alignItems: 'center'
+  }
 });
 
 export default CategoryMealScreen;
